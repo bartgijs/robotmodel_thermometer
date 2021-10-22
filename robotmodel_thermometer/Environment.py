@@ -1,4 +1,5 @@
 import rclpy
+from .temperature_conversions import *
 from rclpy.node import Node
 from std_msgs.msg import Float32
 from .constants import Constants
@@ -8,7 +9,7 @@ class EnvironMent(Node):
     temperature = 20.0
 
     def __init__(self):
-        publisherTimerPeriod = 1.0  # seconds
+        publisherTimerPeriod = Constants.environment_interval  # seconds
         temperatureTimerPeriod = 5.0  # seconds
 
         super().__init__('minimal_publisher')
@@ -26,7 +27,7 @@ class EnvironMent(Node):
 
     def sub_callback(self, msg):
         self.get_logger().info('I heard: "%s"' % msg.data)
-        self.temperature = self.temperature + msg.data
+        self.temperature = convert_power_to_temp(msg.data, self.temperature)
     
     def temp_timer_callback(self):
         self.temperature = self.temperature - 1
