@@ -4,7 +4,7 @@ package_name = 'robotmodel_thermometer'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='1.0.0',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -13,10 +13,10 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='bart',
-    maintainer_email='bartgijsbertsen@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    maintainer='Bart Gijsbertsen',
+    maintainer_email='GLJ.Gijsbertsen@student.han.nl',
+    description='Boiler according to the robot model: Proves ROS communication between devices',
+    license='WTFPL',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
