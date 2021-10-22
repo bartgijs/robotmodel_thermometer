@@ -3,7 +3,8 @@ from rclpy.node import Node
 
 from std_msgs.msg import Float32
 import math
-import constants
+from .constants import Constants
+from .temperature_conversions import *
 
 
 #Publisher
@@ -18,11 +19,11 @@ class Thermometer(Node):
         self.time = 0
         self.min = 20
         self.range = 15
-        self.delta = constants.Constants.sensor_delta
+        self.delta = Constants.sensor_delta
 
         self.subscription = self.create_subscription(
             Float32,
-            constants.topic_stimuli,
+            Constants.topic_stimuli,
             self.listener_callback,
             10)
         self.subscription  # prevent unused variable warning
@@ -35,10 +36,11 @@ class Thermometer(Node):
 
 
     def listener_callback(self, msg):
-        self.get_logger().info('temperature is "%s" ' %  self.min + self.range * {msg.data}, 'Farenheid')
+        Temp = convert_celsius_to_fahrenheit(self.min + self.range * {msg.data})
+        self.get_logger().info('temperature is "%s" ' %  Temp, 'Farenheid')
 
         sg = Float32()
-        msg.data = self.Temperature
+        msg.data = Temp
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
         self.i += 1
@@ -63,7 +65,7 @@ if __name__ == '__main__':
 
 
 
-
+#F = (1.8/C) * 32
 
 
 ##van Celcius naar Farenheid --> C = (F-32)/1.8
