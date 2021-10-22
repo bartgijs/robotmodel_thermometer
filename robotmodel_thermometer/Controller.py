@@ -1,8 +1,10 @@
+from functools import _CacheInfo
 import rclpy, random
 from .constants import *
 from .temperature_conversions import *
 from rclpy.node import Node
 from std_msgs.msg import Float32
+import numpy as np
 
 listen_topic = Constants.topic_percepts
 publish_topic = Constants.topic_commands
@@ -12,7 +14,7 @@ setpoint_topic = Constants.topic_setpoint
 class RobotmodelController(Node):
     setpoint = 21
     capacity = Constants.water_volume
-    belief = Constants.start_temperature + random.uniform(-5, 5)
+    belief = np.array([[Constants.start_temperature + random.uniform(-5, 5)], [0]])
 
     def __init__(self):
         super().__init__('Controller')
@@ -55,6 +57,9 @@ class RobotmodelController(Node):
         if wattage > Constants.max_output_power:
             wattage = Constants.max_output_power
 
+        if wattage < 0:
+            wattage = 0
+
         self.publish(float(wattage))
 
     def publish(self, power_command):
@@ -63,6 +68,10 @@ class RobotmodelController(Node):
         self.publisher.publish(msg)
 
     def kalman_filtering(self):
+        # u_t = A_t u_{t-1}
+        self.belief[0][0] = 
+
+        R_t = np.array([[Constants.sensor_delta], [Constants.heater_delta]]) @ np.array([[Constants.sensor_delta, Constants.heater_delta]])
         pass
 
 
@@ -70,15 +79,16 @@ def main(args=None):
     rclpy.init(args=args)
 
     controller = RobotmodelController()
+    controller.kalman_filtering()
 
-    print("Controller started:")
-    print("   Listening on /", listen_topic, sep="")
-    print("   Publishing on /", publish_topic, sep="")
+    # print("Controller started:")
+    # print("   Listening on /", listen_topic, sep="")
+    # print("   Publishing on /", publish_topic, sep="")
 
-    rclpy.spin(controller)
+    # rclpy.spin(controller)
 
-    controller.destroy_node()
-    rclpy.shutdown()
+    # controller.destroy_node()
+    # rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
