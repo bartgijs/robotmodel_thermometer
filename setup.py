@@ -20,7 +20,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'Controller = robotmodel_thermometer.Controller:main'
+            'Controller = robotmodel_thermometer.Controller:main',
+            'Thermometer = robotmodel_thermometer.Thermometer:main',
+            'Heater = robotmodel_thermometer.Heater:main',
+            'Environment = robotmodel_thermometer.Environment:main',
         ],
     },
 )
