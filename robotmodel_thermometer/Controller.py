@@ -1,5 +1,6 @@
-import rclpy
+import rclpy, random
 from .constants import *
+from .temperature_conversions import *
 from rclpy.node import Node
 from std_msgs.msg import Float32
 
@@ -7,9 +8,11 @@ listen_topic = Constants.topic_percepts
 publish_topic = Constants.topic_commands
 setpoint_topic = Constants.topic_setpoint
 
+
 class RobotmodelController(Node):
     setpoint = 21
     capacity = Constants.water_volume
+    belief = Constants.start_temperature + random.uniform(-5, 5)
 
     def __init__(self):
         super().__init__('Controller')
@@ -41,7 +44,18 @@ class RobotmodelController(Node):
         self.setpoint = msg.data
 
     def temperature_listener_callback(self, msg):
-        pass
+        measurement = convert_fahrenheit_to_celsius(msg.data)
+
+        # TODO: Update belief based on the Kalman filter
+
+        # TODO: Calculate wattage output given a temperature difference from the setpoint
+
+        wattage = 200
+
+        if wattage > Constants.max_output_power:
+            wattage = Constants.max_output_power
+
+        self.publish(float(wattage))
 
     def publish(self, power_command):
         msg = Float32()
