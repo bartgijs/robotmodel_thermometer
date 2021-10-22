@@ -48,9 +48,9 @@ class RobotmodelController(Node):
 
     def temperature_listener_callback(self, msg):
         measurement = convert_fahrenheit_to_celsius(msg.data)
-        measurement = msg.data
 
         # TODO: Update belief based on the Kalman filter
+        
 
         # Calculate wattage output given a temperature difference from the setpoint
         delta_T = self.setpoint - measurement #self.belief[0][0]
