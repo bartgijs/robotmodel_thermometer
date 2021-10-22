@@ -9,3 +9,9 @@ class Constants:
 
     # Sensor
     sensor_delta = 0.07
+
+    # Topics
+    topic_stimuli  = 'stimuli'
+    topic_percepts = 'percepts'
+    topic_commands = 'commands'
+    topic_actions  = 'actions'
