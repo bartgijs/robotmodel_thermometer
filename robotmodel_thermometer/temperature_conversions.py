@@ -1,4 +1,4 @@
-from constants import Constants
+from .constants import Constants
 
 def convert_fahrenheit_to_celsius(fahrenheit):
     return (fahrenheit - 32) * (5 / 9)
