@@ -11,8 +11,12 @@ class Constants:
     # Sensor
     sensor_delta = 0.07
 
+    # Controller
+    max_output_power = 1200 # W
+
     # Topics
     topic_stimuli  = 'stimuli'
     topic_percepts = 'percepts'
     topic_commands = 'commands'
     topic_actions  = 'actions'
+    topic_setpoint = 'setpoint'
