@@ -15,3 +15,4 @@ class Constants:
     topic_percepts = 'percepts'
     topic_commands = 'commands'
     topic_actions  = 'actions'
+    topic_setpoint = 'setpoint'
