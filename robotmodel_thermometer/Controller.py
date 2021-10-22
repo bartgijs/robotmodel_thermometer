@@ -14,7 +14,8 @@ setpoint_topic = Constants.topic_setpoint
 class RobotmodelController(Node):
     setpoint = 21
     capacity = Constants.water_volume
-    belief = np.array([[Constants.start_temperature + random.uniform(-5, 5)], [0]])
+    belief = np.array([[Constants.start_temperature + random.uniform(-Constants.initial_T_uncertainty, Constants.initial_T_uncertainty)], [0]])
+    uncertainty = np.array([[Constants.initial_T_uncertainty], [Constants.initial_P_uncertainty]])
 
     def __init__(self):
         super().__init__('Controller')
@@ -47,12 +48,14 @@ class RobotmodelController(Node):
 
     def temperature_listener_callback(self, msg):
         measurement = convert_fahrenheit_to_celsius(msg.data)
+        measurement = msg.data
 
         # TODO: Update belief based on the Kalman filter
 
-        # TODO: Calculate wattage output given a temperature difference from the setpoint
-
-        wattage = 200
+        # Calculate wattage output given a temperature difference from the setpoint
+        delta_T = self.setpoint - measurement #self.belief[0][0]
+        print("Setpoint (", self.setpoint, ") - Measurement (", measurement, ") = ", delta_T, sep="")
+        wattage = convert_deltaT_to_power(delta_T)
 
         if wattage > Constants.max_output_power:
             wattage = Constants.max_output_power
@@ -65,14 +68,17 @@ class RobotmodelController(Node):
     def publish(self, power_command):
         msg = Float32()
         msg.data = power_command
-        self.publisher.publish(msg)
+        self.power_command_publisher.publish(msg)
 
     def kalman_filtering(self):
-        # u_t = A_t u_{t-1}
-        self.belief[0][0] = 
-
-        R_t = np.array([[Constants.sensor_delta], [Constants.heater_delta]]) @ np.array([[Constants.sensor_delta, Constants.heater_delta]])
         pass
+        # # u_t = A_t u_{t-1} --> Integrate the change in input power into the temperature
+        # self.belief[0][0] = convert_power_to_temp(self.belief[1][0], self.belief[0][0])
+        
+        # # E_t = A_t E_{t-1} A^T_t + R_t
+        # R_t = np.array([[Constants.sensor_delta], [Constants.heater_delta]]) @ np.array([[Constants.sensor_delta, Constants.heater_delta]])
+
+        
 
 
 def main(args=None):
@@ -81,14 +87,14 @@ def main(args=None):
     controller = RobotmodelController()
     controller.kalman_filtering()
 
-    # print("Controller started:")
-    # print("   Listening on /", listen_topic, sep="")
-    # print("   Publishing on /", publish_topic, sep="")
+    print("Controller started:")
+    print("   Listening on /", listen_topic, sep="")
+    print("   Publishing on /", publish_topic, sep="")
 
-    # rclpy.spin(controller)
+    rclpy.spin(controller)
 
-    # controller.destroy_node()
-    # rclpy.shutdown()
+    controller.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

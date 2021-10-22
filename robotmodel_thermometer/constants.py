@@ -13,6 +13,8 @@ class Constants:
 
     # Controller
     max_output_power = 1200 # W
+    initial_T_uncertainty = 5 # C
+    initial_P_uncertainty = 10 # W
 
     # Topics
     topic_stimuli  = 'stimuli'
