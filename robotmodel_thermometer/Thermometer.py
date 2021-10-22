@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-
+import numpy as np
 from std_msgs.msg import Float32
 import math
 from .constants import Constants
@@ -14,7 +14,7 @@ class Thermometer(Node):
 
     def __init__(self):
         super().__init__('minimal_publisher')
-        self.publisher_ = self.create_publisher(Float32, 'topic', 10)
+        self.publisher_ = self.create_publisher(Float32, Constants.topic_percepts, 10)
         self.i = 0
         self.time = 0
         self.min = 20
@@ -36,11 +36,14 @@ class Thermometer(Node):
 
 
     def listener_callback(self, msg):
-        Temp = convert_celsius_to_fahrenheit(self.min + self.range * {msg.data})
-        self.get_logger().info('temperature is "%s" ' %  Temp, 'Farenheid')
+        Temp = convert_celsius_to_fahrenheit(msg.data)
+        self.get_logger().info('temperature is "%s" ' %  msg.data)
+
+        mu, sigma = 0, Constants.sensor_delta # mean and standard deviation
+        noise = float(np.random.normal(mu, sigma, 1))
 
         sg = Float32()
-        msg.data = Temp
+        msg.data = Temp+noise
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
         self.i += 1
