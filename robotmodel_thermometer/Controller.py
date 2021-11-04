@@ -91,7 +91,6 @@ def main(args=None):
     rclpy.init(args=args)
 
     controller = RobotmodelController()
-    controller.kalman_filtering()
 
     print("Controller started:")
     print("   Listening on /", listen_topic, sep="")
