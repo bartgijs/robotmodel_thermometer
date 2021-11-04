@@ -14,7 +14,7 @@ class Thermometer(Node):
 
     def __init__(self):
         super().__init__('minimal_publisher')
-        self.publisher_ = self.create_publisher(Float32, 'topic', 10)
+        self.publisher_ = self.create_publisher(Float32, 'percepts', 10)
         self.i = 0
         self.time = 0
         self.min = 20
@@ -36,8 +36,8 @@ class Thermometer(Node):
 
 
     def listener_callback(self, msg):
-        Temp = convert_celsius_to_fahrenheit(self.min + self.range * {msg.data})
-        self.get_logger().info('temperature is "%s" ' %  Temp, 'Farenheid')
+        Temp = convert_celsius_to_fahrenheit(msg.data)
+        self.get_logger().info('temperature is "%s" Fahrenheit ' %  Temp)
 
         sg = Float32()
         msg.data = Temp
