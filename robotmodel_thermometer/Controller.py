@@ -14,7 +14,7 @@ setpoint_topic = Constants.topic_setpoint
 class RobotmodelController(Node):
     setpoint = 21
     capacity = Constants.water_volume
-    belief = np.array([[Constants.start_temperature + random.uniform(-Constants.initial_T_uncertainty, Constants.initial_T_uncertainty)], [0]])
+    belief = np.array([[Constants.start_temperature + random.uniform(-Constants.initial_T_uncertainty, Constants.initial_T_uncertainty)]])
     uncertainty = np.array([[1]])
 
     # Constants
