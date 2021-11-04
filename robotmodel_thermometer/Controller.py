@@ -15,7 +15,15 @@ class RobotmodelController(Node):
     setpoint = 21
     capacity = Constants.water_volume
     belief = np.array([[Constants.start_temperature + random.uniform(-Constants.initial_T_uncertainty, Constants.initial_T_uncertainty)], [0]])
-    uncertainty = np.array([[Constants.initial_T_uncertainty], [Constants.initial_P_uncertainty]])
+    uncertainty = np.array([[1]])
+
+    # Constants
+    A_t = np.array([[1]])
+    B_t = np.array([[1]])
+    C_t = np.array([[1]])
+    Q_t = np.array([[Constants.sensor_delta]])
+    R_t = np.array([[Constants.heater_delta]])
+    previous_action = np.array([[0]])
 
     def __init__(self):
         super().__init__('Controller')
@@ -49,11 +57,11 @@ class RobotmodelController(Node):
     def temperature_listener_callback(self, msg):
         measurement = convert_fahrenheit_to_celsius(msg.data)
 
-        # TODO: Update belief based on the Kalman filter
-        
+        # Update belief based on the Kalman filter
+        self.kalman_filtering(measurement)
 
         # Calculate wattage output given a temperature difference from the setpoint
-        delta_T = self.setpoint - measurement #self.belief[0][0]
+        delta_T = self.setpoint - self.belief[0][0]
         print("Setpoint (", self.setpoint, ") - Measurement (", measurement, ") = ", delta_T, sep="")
         wattage = convert_deltaT_to_power(delta_T)
 
@@ -70,14 +78,12 @@ class RobotmodelController(Node):
         msg.data = power_command
         self.power_command_publisher.publish(msg)
 
-    def kalman_filtering(self):
-        pass
-        # # u_t = A_t u_{t-1} --> Integrate the change in input power into the temperature
-        # self.belief[0][0] = convert_power_to_temp(self.belief[1][0], self.belief[0][0])
-        
-        # # E_t = A_t E_{t-1} A^T_t + R_t
-        # R_t = np.array([[Constants.sensor_delta], [Constants.heater_delta]]) @ np.array([[Constants.sensor_delta, Constants.heater_delta]])
-
+    def kalman_filtering(self, measurement):
+        predicted_belief = self.A_t @ self.belief + self.B_t @ self.previous_action
+        self.uncertainty = self.A_t @ self.uncertainty @ self.A_t.transpose() + self.R_t
+        gain = self.uncertainty @ self.C_t.transpose() @ (self.C_t @ self.uncertainty @ self.C_t.transpose() + self.Q_t)
+        self.belief = predicted_belief + gain @ (measurement - self.C_t @ predicted_belief)
+        self.uncertainty = (np.identity(1) - gain @ self.C_t) * self.uncertainty
         
 
 
